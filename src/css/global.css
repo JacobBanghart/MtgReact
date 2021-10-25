@@ -1,0 +1,23 @@
+html{
+    height: 100%;
+    width: 100%;
+}
+body{
+    height: 100%;
+    width: 100%;
+    background-color: lightgray !important;
+}
+#root{
+    height: 100%;
+    width: 100%;
+}
+
+.d-flex{
+    display: flex !important;
+}
+.align-items-center{
+    align-items: center;
+}
+.flex-column{
+    flex-direction: column;
+}
