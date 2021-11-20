@@ -4,18 +4,8 @@ export default class Card {
   name: string = '';
   count: number = 1;
 
-  constructor({
-    id = '',
-    name,
-    count = 1,
-  }: {
-        id?: string,
-        name: string,
-        count?: number
-    }) {
-    this.id = !!id ? id : this.id;
-    this.name = name;
-    this.count = count;
+  constructor(cardObject: any) {
+    Object.assign(this, cardObject);
   }
   increment() {
     this.count = this.count + 1;

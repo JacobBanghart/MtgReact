@@ -68,6 +68,7 @@ function CardListItem(
       key={card.count}
       secondaryAction={
         <IconButton edge="end" aria-label="delete" onClick={()=>{
+          dispatch({type: 'REMOVE_CARD_ALL_BINS', cardId: card.id});
           dispatch({type: 'CARD_REMOVED', id: card.id});
         }}>
           <DeleteIcon/>

@@ -1,8 +1,10 @@
 import React from 'react';
 import {
+  Card,
   CardBin,
 } from '../../models';
 import {
+  Card as CardComp,
   List,
   ListItem,
   IconButton,
@@ -21,7 +23,6 @@ export default function BinList() {
   const forceUpdate = useForceUpdate();
   const binStore = useSelector((state: any)=>state.BinStore);
   const dispatch = useDispatch();
-
   return (
     <List dense>
       <TransitionGroup
@@ -52,8 +53,9 @@ function CardBinListItem(
   const [, drop] = useDrop(
       ()=> ({
         accept: 'card',
-        drop: () => {
-          console.log('dropped');
+        drop: (card: Card) => {
+          dispatch({type: 'CARDBIN_ADD_CARD', id: cardBin.id, cardId: card.id});
+          forceUpdate();
         },
       }),
   );
@@ -62,6 +64,7 @@ function CardBinListItem(
       ref={drop}
       className="card-listItem"
       disablePadding
+      key={cardBin.cards.length}
     >
       <div className="cardBin-ListItem">
         <div className="cardBin-Header">
@@ -87,13 +90,105 @@ function CardBinListItem(
             </IconButton>
           }
         </div>
-        <div className="p-2">
-          <div className="dropArea p-2">
-                    Drop Area
-          </div>
-        </div>
+        <CardBinCardList
+          cardBinId={cardBin.id}
+          cardLength={cardBin.cards.length}
+          cards={cardBin.cards}
+          forceUpdate={forceUpdate}
+        />
       </div>
     </ListItem>
+  );
+}
+
+function CardBinCardList(
+    {cardBinId, cardLength, cards, forceUpdate}:
+  {cardBinId: string, cardLength: number, cards: string[], forceUpdate: any
+}) {
+  return (
+    <div>
+      {cardLength > 0 ?
+        <CardList
+          cardBinId={cardBinId}
+          cards={cards}
+          forceUpdate={forceUpdate}
+        /> :
+        <EmptyDropArea />
+      }
+    </div>
+  );
+}
+
+function CardList(
+    {cardBinId, cards, forceUpdate}:
+  {cardBinId: string, cards:string[], forceUpdate: any}) {
+  const deckStore = useSelector((state: any)=>state.DeckStore);
+  return (
+    <TransitionGroup
+      className="card-list"
+    >
+      {cards.map((card) =>
+        <CSSTransition
+          key={card}
+          timeout={500}
+          classNames="fade"
+        >
+          <CardListDisplayItem
+            cardBinId={cardBinId}
+            card={deckStore.find((item: Card) => item.id == card) as Card}
+            forceUpdate={forceUpdate}
+          />
+        </CSSTransition>,
+      )}
+    </TransitionGroup>
+  );
+}
+
+function CardListDisplayItem(
+    {cardBinId, card, forceUpdate}:
+  {cardBinId: string, card: Card, forceUpdate: any
+}) {
+  if (!card?.name) {
+    forceUpdate();
+  }
+  const dispatch = useDispatch();
+  return (
+    <CardComp className="mx-3 mb-1">
+      <div className="d-flex flex-row ml-1 align-items-center">
+        <div>
+          {card?.count}:
+        </div>
+        <div className="ml-1">
+          {card?.name}
+        </div>
+        <div className="ml-auto mr-1">
+          <IconButton
+            onClick={
+              ()=>{
+                dispatch({
+                  type: 'CARDBIN_REMOVE_CARD',
+                  id: cardBinId,
+                  cardId: card?.id,
+                });
+                forceUpdate();
+              }
+            }
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
+      </div>
+    </CardComp>
+  );
+}
+
+function EmptyDropArea() {
+  return (
+    <div className="p-2">
+      <div className="dropArea p-2">
+        Drop Area
+      </div>
+    </div>
   );
 }
 
@@ -108,7 +203,7 @@ function RenderAddSub(
       <div>
         <IconButton
           onClick={()=>{
-            dispatch({type: 'CARD_WEIGHT_DECREMENT', id: cardBin.id});
+            dispatch({type: 'CARDBIN_WEIGHT_DECREMENT', id: cardBin.id});
             forceUpdate();
           }}
         >
@@ -117,7 +212,7 @@ function RenderAddSub(
         {cardBin.weight}
         <IconButton
           onClick={()=>{
-            dispatch({type: 'CARD_WEIGHT_INCREMENT', id: cardBin.id});
+            dispatch({type: 'CARDBIN_WEIGHT_INCREMENT', id: cardBin.id});
             forceUpdate();
           }}
         >

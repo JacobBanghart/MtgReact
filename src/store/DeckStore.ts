@@ -4,9 +4,9 @@ function filterOutCard(state: Card[], id: string | undefined = '') {
   return id == '' ? state : state.filter((item) => item.id !== id);
 }
 
-function addCard(state: Card[], name = '') {
+function addCard(state: Card[], newCard: any) {
   const localState = [...state];
-  localState.push(new Card({name}));
+  localState.push(new Card(newCard));
   return localState;
 }
 
@@ -29,7 +29,8 @@ function cardDecrement(state: Card[], id: string = '') {
 const DeckStore = (state: Card[], action: {
     type: string,
     name?: string,
-    id?: string
+    id?: string,
+    newCard?: any
 }) => {
   if ( typeof state === 'undefined') {
     if (localStorage.getItem('DeckStore')) {
@@ -43,7 +44,8 @@ const DeckStore = (state: Card[], action: {
     case 'CARD_REMOVED':
       return filterOutCard(state, action?.id);
     case 'CARD_ADDED':
-      return addCard(state, action?.name);
+      console.log(action?.newCard);
+      return addCard(state, action?.newCard);
     case 'CARD_COUNT_INCREMENT':
       return cardIncrement(state, action?.id);
     case 'CARD_COUNT_DECREMNT':
